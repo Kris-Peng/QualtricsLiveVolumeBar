@@ -1,15 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Live Volume Bar</title>
+  <style>
+    #volumeBar {
+      width: 100%;
+      height: 30px;
+      background-color: #eee;
+      border: 1px solid #ccc;
+    }
+    #level {
+      height: 100%;
+      width: 0%;
+      background-color: green;
+    }
+  </style>
 </head>
-<body style="font-family: sans-serif; margin: 20px;">
+<body>
   <h3>Speak into your microphone</h3>
-  <div id="volumeBar" style="width: 100%; background-color: #eee; border: 1px solid #ccc; height: 30px;">
-    <div id="level" style="width: 0%; height: 100%; background-color: green;"></div>
+  <div id="volumeBar">
+    <div id="level"></div>
   </div>
+
   <script>
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then(function(stream) {
@@ -23,17 +36,23 @@
 
         function updateVolume() {
           analyser.getByteFrequencyData(dataArray);
-          let volume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-          let percent = Math.min(100, volume / 2);
-          document.getElementById("level").style.width = percent + "%";
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            sum += dataArray[i];
+          }
+          const average = sum / dataArray.length;
+          const volumePercent = Math.min(100, average / 1.5); // tweak scale
+
+          document.getElementById('level').style.width = volumePercent + '%';
+
           requestAnimationFrame(updateVolume);
         }
 
         updateVolume();
       })
       .catch(function(err) {
-        console.error("Microphone access denied:", err);
-        alert("Please allow microphone access to see the volume bar.");
+        console.error('Microphone error:', err);
+        alert('Please allow microphone access.');
       });
   </script>
 </body>
