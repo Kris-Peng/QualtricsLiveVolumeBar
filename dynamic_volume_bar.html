@@ -4,16 +4,22 @@
   <meta charset="UTF-8">
   <title>Live Volume Bar</title>
   <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
     #volumeBar {
       width: 100%;
       height: 30px;
       background-color: #eee;
       border: 1px solid #ccc;
+      margin-top: 10px;
     }
     #level {
       height: 100%;
       width: 0%;
       background-color: green;
+      transition: width 0.1s linear;
     }
   </style>
 </head>
@@ -41,18 +47,16 @@
             sum += dataArray[i];
           }
           const average = sum / dataArray.length;
-          const volumePercent = Math.min(100, average / 1.5); // tweak scale
-
-          document.getElementById('level').style.width = volumePercent + '%';
-
+          const volumePercent = Math.min(100, average); // scale up if needed
+          document.getElementById("level").style.width = volumePercent + "%";
           requestAnimationFrame(updateVolume);
         }
 
         updateVolume();
       })
       .catch(function(err) {
-        console.error('Microphone error:', err);
-        alert('Please allow microphone access.');
+        console.error("Microphone access denied or error:", err);
+        alert("Microphone access is required to see the volume bar.");
       });
   </script>
 </body>
